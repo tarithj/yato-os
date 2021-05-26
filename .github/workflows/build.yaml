@@ -31,7 +31,6 @@ jobs:
           make os-image.bin
 
       - uses: "marvinpinto/action-automatic-releases@latest"
-      - name: "Publish to github"
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
           automatic_release_tag: "latest"
