@@ -20,7 +20,7 @@ jobs:
         run: |
           echo downloading i386 gcc toolkit script
           cd ./scripts/
-          wget https://gist.githubusercontent.com/tarithj/218a45456344d9d478ce21a9d9951c23/raw/6dc369bcc70639a3ffcd010f5f4eb88f4560b181/install_i386gcc.sh
+          wget https://gist.githubusercontent.com/tarithj/218a45456344d9d478ce21a9d9951c23/raw/4d45b6188e3c1b66bedba089180f94a3324b927d/install_i386gcc.sh
           echo downloaded i386 gcc toolkit script
           echo running toolkit script
           sudo chmod +x ./install_i386gcc.sh
