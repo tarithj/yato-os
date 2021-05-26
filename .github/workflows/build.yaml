@@ -25,6 +25,10 @@ jobs:
           echo running toolkit script
           sudo chmod +x ./install_i386gcc.sh
           sudo ./install_i386gcc.sh
+          echo done toolkit installation
+
+          echo installing nasm
+          sudo apt install nasm
           cd ..
 
       - name: "Build"
