@@ -10,7 +10,7 @@
 #define KERNEL_SWITCHED_MESSAGE "switched to kernel\n"
 #define KERNEL_DONE_MESSAGE "Wellcome to YATO\n"
 
-void main()
+void kernel_main()
 {
 	kprint_at(KERNEL_SWITCHED_MESSAGE, -1, -1);
 
