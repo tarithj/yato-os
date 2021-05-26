@@ -1,0 +1,41 @@
+name: "dev-release"
+
+on:
+  push:
+    branches:
+      - "master"
+
+jobs:
+  dev-release:
+    name: "Dev Release"
+    runs-on: "ubuntu-latest"
+
+    steps:
+      - name: "Create dirs"
+        run: |
+          mkdir ./scripts/
+
+      - name: "Setup build enviroment"
+        run: |
+          echo downloading i386 gcc toolkit script
+          cd ./scripts/
+          wget https://gist.githubusercontent.com/tarithj/218a45456344d9d478ce21a9d9951c23/raw/6dc369bcc70639a3ffcd010f5f4eb88f4560b181/install_i386gcc.sh
+          echo downloaded i386 gcc toolkit script
+          echo running toolkit script
+          ./install_i386gcc.sh
+          cd ..
+
+      - name: "Build"
+        run: |
+          make os-image.bin
+
+      - uses: "marvinpinto/action-automatic-releases@latest"
+      - name: "Publish to github"
+        with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          automatic_release_tag: "latest"
+          prerelease: true
+          title: "Development Release"
+          files: |
+            LICENSE.txt
+            os-image.bin
