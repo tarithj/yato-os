@@ -23,7 +23,8 @@ jobs:
           wget https://gist.githubusercontent.com/tarithj/218a45456344d9d478ce21a9d9951c23/raw/6dc369bcc70639a3ffcd010f5f4eb88f4560b181/install_i386gcc.sh
           echo downloaded i386 gcc toolkit script
           echo running toolkit script
-          ./install_i386gcc.sh
+          sudo chmod +x ./install_i386gcc.sh
+          sudo ./install_i386gcc.sh
           cd ..
 
       - name: "Build"
