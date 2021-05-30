@@ -2,6 +2,8 @@
 #include "../libc/string.h"
 #include "./ksh.h"
 #include "../drivers/cmos_rtc.h"
+#include "../libc/mem.h"
+#include <stdint.h>
 
 void ksh_handle(char *input)
 {
@@ -39,6 +41,19 @@ void ksh_handle(char *input)
         int_to_ascii(a.year, y);
         kprint(y);
 
+        kprint("\n");
+    } else if (strcmp(input, "PAGE") == 0) {
+        /* Lesson 22: Code to test kmalloc, the rest is unchanged */
+        uint32_t phys_addr;
+        uint32_t page = kmalloc(1000, 1, &phys_addr);
+        char page_str[16] = "";
+        hex_to_ascii(page, page_str);
+        char phys_str[16] = "";
+        hex_to_ascii(phys_addr, phys_str);
+        kprint("Page: ");
+        kprint(page_str);
+        kprint(", physical address: ");
+        kprint(phys_str);
         kprint("\n");
     }
     else
