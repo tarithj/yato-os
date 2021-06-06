@@ -31,14 +31,14 @@ disk_load:
 	int 0x13
 	; In case of error...
 
-	;jc disk_error <- comment, we don't want that!
+	jc disk_error
 	; ...but if there's no errors...
 
 	pop dx
 	; Compare the number of sectors read.
 	cmp al, dh
 	; And in case of errors...
-	;jne sectors_error <- comment, we don't want that!
+	jne sectors_error
 	; ...if no errors...
 	popa
 	; ...we stop.
