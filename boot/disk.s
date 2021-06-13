@@ -51,14 +51,26 @@ disk_error:
     call print_nl
     mov dh, ah ; ah = error code, dl = disk drive that dropped the error
     call print_hex ; check out the code at http://stanislavs.org/helppc/int_13-1.html
-    jmp disk_loop
+
+	mov bx, MSG_FAILED
+    call print
+    call print_nl
+	
+	jmp disk_loop
 
 sectors_error:
     mov bx, SECTORS_ERROR
     call print
+	call print_nl
+
+	mov bx, MSG_FAILED
+    call print
+    call print_nl
+	
 
 disk_loop:
     jmp $
 
 DISK_ERROR: db "Disk read error", 0
 SECTORS_ERROR: db "Incorrect number of sectors read", 0
+MSG_FAILED: db "Cant give control to kernel!", 0
