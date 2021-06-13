@@ -13,17 +13,20 @@
 
 void kernel_main()
 {
-	kprint_at(KERNEL_SWITCHED_MESSAGE, -1, -1);
+	kprint(KERNEL_SWITCHED_MESSAGE);
 
 	isr_install();
 	asm volatile("sti");
 	init_keyboard();
 
-	kprint_at(KERNEL_DONE_MESSAGE, -1, -1);
-	kprint_at(KERNEL_INFO_MESSAGE, -1, -1);
+	kprint(KERNEL_DONE_MESSAGE);
+	kprint(KERNEL_INFO_MESSAGE);
 }
 
+// handle user input at the kernel level
 void user_input(char *input)
 {
+
+	// call ksh to handle user input
 	ksh_handle(input);
 }
