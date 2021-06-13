@@ -9,7 +9,7 @@
 
 #define KERNEL_SWITCHED_MESSAGE "switched to kernel\n"
 #define KERNEL_DONE_MESSAGE "Wellcome to YATO\n"
-#define KERNEL_INFO_MESSAGE "Type \"help\" to get a list of all KSH commands avaliable\n"
+#define KERNEL_INFO_MESSAGE "Type \"help\" to get a list of all KSH commands avaliable\nThis OS is licenced under MIT and is created for educational purposes\nCreated by Tarith Jayasoriya\n"
 
 void kernel_main()
 {
