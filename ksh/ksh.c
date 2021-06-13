@@ -57,6 +57,12 @@ void ksh_handle(char *input)
         kprint(phys_str);
         kprint("\n");
     }
+    else if (strcmp(input, "HELP") == 0)
+    {
+        kprint("\n");
+        kprint("DT      displays date time info in UTC using cmos\n");
+        kprint("PAGE    allocates a page\n");
+    }
     else
     {
         kprint("You said: ");
