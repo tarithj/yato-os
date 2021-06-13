@@ -9,6 +9,7 @@
 
 #define KERNEL_SWITCHED_MESSAGE "switched to kernel\n"
 #define KERNEL_DONE_MESSAGE "Wellcome to YATO\n"
+#define KERNEL_INFO_MESSAGE "Type \"help\" to get a list of all KSH commands avaliable\n"
 
 void kernel_main()
 {
@@ -19,6 +20,7 @@ void kernel_main()
 	init_keyboard();
 
 	kprint_at(KERNEL_DONE_MESSAGE, -1, -1);
+	kprint_at(KERNEL_INFO_MESSAGE, -1, -1);
 }
 
 void user_input(char *input)
