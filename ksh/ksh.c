@@ -42,8 +42,9 @@ void ksh_handle(char *input)
         kprint(y);
 
         kprint("\n");
-    } else if (strcmp(input, "PAGE") == 0) {
-        /* Lesson 22: Code to test kmalloc, the rest is unchanged */
+    }
+    else if (strcmp(input, "PAGE") == 0)
+    {
         uint32_t phys_addr;
         uint32_t page = kmalloc(1000, 1, &phys_addr);
         char page_str[16] = "";
