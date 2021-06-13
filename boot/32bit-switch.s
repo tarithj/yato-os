@@ -7,7 +7,7 @@ switch_to_protected_mode:
 	; Set 32-bit mode in CR0 register!
 	mov eax, cr0
 	or eax, 0x1
-	mov cr0, eax ; <==== LOAD cr0 to notify the processo
+	mov cr0, eax ; <==== LOAD cr0 to notify the processor
 	; And jump to our code segment!
 	jmp CODE_SEG:init_protected_mode ; <===== do a FAR jump in the CODE_SEG
 
