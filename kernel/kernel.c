@@ -18,6 +18,7 @@ void kernel_main()
 	isr_install();
 	asm volatile("sti");
 	init_keyboard();
+	init_timer(50);
 
 	kprint(KERNEL_DONE_MESSAGE);
 	kprint(KERNEL_INFO_MESSAGE);
