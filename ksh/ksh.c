@@ -3,7 +3,29 @@
 #include "./ksh.h"
 #include "../drivers/cmos_rtc.h"
 #include "../libc/mem.h"
+#include "../cpu/timer.h"
 #include <stdint.h>
+
+/**
+ * K&R implementation
+ */
+void uint32_t_to_ascii(uint32_t n, char str[])
+{
+    int i, sign;
+    if ((sign = n) < 0)
+        n = -n;
+    i = 0;
+    do
+    {
+        str[i++] = n % 10 + '0';
+    } while ((n /= 10) > 0);
+
+    if (sign < 0)
+        str[i++] = '-';
+    str[i] = '\0';
+
+    reverse(str);
+}
 
 void ksh_handle(char *input)
 {
@@ -57,11 +79,25 @@ void ksh_handle(char *input)
         kprint(phys_str);
         kprint("\n");
     }
+    else if (strcmp(input, "TIMER") == 0)
+    {
+        kprint("Tick: ");
+
+        uint32_t tick;
+        get_tick(&tick);
+
+        char tick_ascii[256];
+        int_to_ascii(tick, tick_ascii);
+        kprint(tick_ascii);
+
+        kprint("\n");
+    }
     else if (strcmp(input, "HELP") == 0)
     {
         kprint("\n");
-        kprint("DT      displays date time info in UTC using cmos\n");
-        kprint("PAGE    allocates a page\n");
+        kprint("DT           displays date time info in UTC using cmos\n");
+        kprint("PAGE         allocates a page\n");
+        kprint("TICK         get current tick\n");
     }
     else
     {
