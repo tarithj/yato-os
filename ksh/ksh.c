@@ -101,7 +101,7 @@ void ksh_handle(char *input)
         kprint("\n");
         kprint("DT           displays date time info in UTC using cmos\n");
         kprint("PAGE         allocates a page\n");
-        kprint("TICK         get current tick\n");
+        kprint("TIMER         get current tick\n");
     }
     else
     {
