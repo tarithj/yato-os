@@ -92,6 +92,10 @@ void ksh_handle(char *input)
 
         kprint("\n");
     }
+    else if (strcmp(input, "CLEAR") == 0)
+    {
+        clear_screen();
+    }
     else if (strcmp(input, "HELP") == 0)
     {
         kprint("\n");
