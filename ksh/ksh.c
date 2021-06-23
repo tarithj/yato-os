@@ -96,6 +96,17 @@ void ksh_handle(char *input)
     {
         clear_screen();
     }
+    else if (strcmp(input, "FILL") == 0)
+    {
+        for (int x = 0; x < MAX_COLS; x++)
+        {
+            for (int y = 0; y < MAX_ROWS; y++)
+            {
+                kput_pixel(x, y, 0x00FFFFFF);
+            }
+        }
+        kput_pixel(100, 0, 0x0FFFFF);
+    }
     else if (strcmp(input, "HELP") == 0)
     {
         kprint("\n");
