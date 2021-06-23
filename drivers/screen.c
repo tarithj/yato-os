@@ -11,6 +11,7 @@ int print_char(char c, int col, int row, char attr);
 int get_offset(int col, int row);
 int get_offset_row(int offset);
 int get_offset_col(int offset);
+void put_pixel(int x, int y, int color);
 
 /**********************************************************
  * Public Kernel API functions                            *
@@ -55,6 +56,11 @@ void kprint_backspace()
     int row = get_offset_row(offset);
     int col = get_offset_col(offset);
     print_char(0x08, col, row, WHITE_ON_BLACK);
+}
+
+void kput_pixel(int x, int y, int color)
+{
+    put_pixel(x, y, color);
 }
 
 /**********************************************************
@@ -162,6 +168,24 @@ void clear_screen()
         screen[i * 2 + 1] = WHITE_ON_BLACK;
     }
     set_cursor_offset(get_offset(0, 0));
+}
+
+void put_pixel(int col, int row, int color)
+{
+    uint8_t *screen = (uint8_t *)VIDEO_ADDRESS;
+
+    /* Error control: print a red 'E' if the coords aren't right */
+    if (col >= MAX_COLS || row >= MAX_ROWS)
+    {
+        screen[2 * (MAX_COLS) * (MAX_ROWS)-2] = 'E';
+        screen[2 * (MAX_COLS) * (MAX_ROWS)-1] = RED_ON_WHITE;
+        return;
+    }
+
+    int loc = get_offset(col, row);
+    screen[loc] = color & 255;             // BLUE
+    screen[loc + 1] = (color >> 8) & 255;  // GREEN
+    screen[loc + 2] = (color >> 16) & 255; // RED
 }
 
 int get_offset(int col, int row) { return 2 * (row * MAX_COLS + col); }

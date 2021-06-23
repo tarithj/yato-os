@@ -18,5 +18,5 @@ void clear_screen();
 void kprint_at(char *message, int col, int row);
 void kprint(char *message);
 void kprint_backspace();
-
+void kput_pixel(int x, int y, int color);
 #endif
