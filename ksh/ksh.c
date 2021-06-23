@@ -114,6 +114,7 @@ void ksh_handle(char *input)
         kprint("PAGE         allocates a page\n");
         kprint("TIMER        get current tick\n");
         kprint("CLEAR        clear screen\n");
+        kprint("FILL         fills the screen\n");
     }
     else
     {
