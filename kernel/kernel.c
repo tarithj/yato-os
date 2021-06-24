@@ -20,6 +20,9 @@ void kernel_main()
 	init_keyboard();
 	init_timer(50);
 
+	sleep(100);
+	clear_screen();
+
 	kprint(KERNEL_DONE_MESSAGE);
 	kprint(KERNEL_INFO_MESSAGE);
 }
