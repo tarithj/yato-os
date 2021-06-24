@@ -4,6 +4,7 @@
 #include "../drivers/cmos_rtc.h"
 #include "../libc/mem.h"
 #include "../cpu/timer.h"
+#include "../drivers/sound.h"
 #include <stdint.h>
 
 /**
@@ -106,6 +107,10 @@ void ksh_handle(char *input)
             }
         }
         kput_pixel(100, 0, 0x0FFFFF);
+    }
+    else if (strcmp(input, "BEEP") == 0)
+    {
+        beep();
     }
     else if (strcmp(input, "HELP") == 0)
     {
