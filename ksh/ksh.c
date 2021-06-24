@@ -120,6 +120,7 @@ void ksh_handle(char *input)
         kprint("TIMER        get current tick\n");
         kprint("CLEAR        clear screen\n");
         kprint("FILL         fills the screen\n");
+        kprint("BEEP         beeps using the pc speaker\n");
     }
     else
     {
