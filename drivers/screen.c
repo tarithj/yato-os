@@ -5,13 +5,14 @@
 #include <stdint.h>
 
 /* Declaration of private functions */
-int get_cursor_offset();
 void set_cursor_offset(int offset);
 int print_char(char c, int col, int row, char attr);
 int get_offset(int col, int row);
 int get_offset_row(int offset);
 int get_offset_col(int offset);
 void put_pixel(int x, int y, int color);
+
+int get_cursor_offset();
 
 /**********************************************************
  * Public Kernel API functions                            *
@@ -61,6 +62,19 @@ void kprint_backspace()
 void kput_pixel(int x, int y, int color)
 {
     put_pixel(x, y, color);
+}
+
+int get_cursor_offset()
+{
+    /* Use the VGA ports to get the current cursor position
+     * 1. Ask for high byte of the cursor offset (data 14)
+     * 2. Ask for low byte (data 15)
+     */
+    port_byte_out(REG_SCREEN_CTRL, 14);
+    int offset = port_byte_in(REG_SCREEN_DATA) << 8; /* High byte: << 8 */
+    port_byte_out(REG_SCREEN_CTRL, 15);
+    offset += port_byte_in(REG_SCREEN_DATA);
+    return offset * 2; /* Position * size of character cell */
 }
 
 /**********************************************************
@@ -131,19 +145,6 @@ int print_char(char c, int col, int row, char attr)
 
     set_cursor_offset(offset);
     return offset;
-}
-
-int get_cursor_offset()
-{
-    /* Use the VGA ports to get the current cursor position
-     * 1. Ask for high byte of the cursor offset (data 14)
-     * 2. Ask for low byte (data 15)
-     */
-    port_byte_out(REG_SCREEN_CTRL, 14);
-    int offset = port_byte_in(REG_SCREEN_DATA) << 8; /* High byte: << 8 */
-    port_byte_out(REG_SCREEN_CTRL, 15);
-    offset += port_byte_in(REG_SCREEN_DATA);
-    return offset * 2; /* Position * size of character cell */
 }
 
 void set_cursor_offset(int offset)

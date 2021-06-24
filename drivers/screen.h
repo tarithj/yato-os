@@ -19,4 +19,7 @@ void kprint_at(char *message, int col, int row);
 void kprint(char *message);
 void kprint_backspace();
 void kput_pixel(int x, int y, int color);
+int get_cursor_offset();
+int get_offset_col(int offset);
+int get_offset_row(int offset);
 #endif
