@@ -30,3 +30,12 @@ void init_timer(uint32_t freq)
     port_byte_out(0x40, low);
     port_byte_out(0x40, high);
 }
+
+void sleep(uint64_t TICKS)
+{
+    asm("cli");
+    uint64_t STOPTICK = tick + TICKS;
+    asm("sti"); // Don't want this part to be interrupted.
+    while (tick < STOPTICK)
+        ;
+}
