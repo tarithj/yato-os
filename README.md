@@ -7,6 +7,7 @@ Yato os is a hobby os that I developed following [osdev](https://wiki.osdev.org)
 - [x] Keyboard support
 - [ ] USB support
 - [x] Interupt handling
+- [x] PC Speaker support
 
 # Building
 1. donwload nasm using `sudo apt install nasm`
