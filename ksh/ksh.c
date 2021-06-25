@@ -105,7 +105,6 @@ void ksh_handle(char *input)
                 kput_pixel(x, y, 0x00FFFFFF);
             }
         }
-        kput_pixel(100, 0, 0x0FFFFF);
     }
     else if (strcmp(input, "BEEP") == 0)
     {
