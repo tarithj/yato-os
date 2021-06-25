@@ -38,7 +38,7 @@ static void keyboard_callback(registers_t *regs)
         int offset = get_cursor_offset();
         int row = get_offset_col(offset);
 
-        if (row == 0)
+        if (row < 3)
         {
             beep();
         }
