@@ -30,7 +30,6 @@ void uint32_t_to_ascii(uint32_t n, char str[])
 
 void ksh_handle(char *input)
 {
-    kprint("> ");
     if (strcmp(input, "DT") == 0)
     {
         struct cmos_rtc_val a = read_rtc();
@@ -128,4 +127,5 @@ void ksh_handle(char *input)
         kprint(input);
         kprint("\n");
     }
+    kprint("> ");
 }

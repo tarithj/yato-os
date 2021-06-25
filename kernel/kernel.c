@@ -25,6 +25,7 @@ void kernel_main()
 
 	kprint(KERNEL_DONE_MESSAGE);
 	kprint(KERNEL_INFO_MESSAGE);
+	kprint("> ");
 }
 
 // handle user input at the kernel level
