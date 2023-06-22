@@ -3,7 +3,8 @@
 
 #include "../cpu/type.h"
 
-#define VIDEO_ADDRESS 0xb8000
+#define VIDEO_ADDRESS_MONOCHROME 0xb0000
+#define VIDEO_ADDRESS_COLOR 0xb8000
 #define MAX_ROWS 25
 #define MAX_COLS 80
 #define WHITE_ON_BLACK 0x0f

@@ -1,16 +1,19 @@
 #include "screen.h"
 #include "../cpu/port.h"
 #include "../libc/mem.h"
+#include "bios.h"
 
 #include <stdint.h>
 
 /* Declaration of private functions */
 void set_cursor_offset(int offset);
-int print_char(char c, int col, int row, char attr);
+uint8_t* get_video_mem();
+int print_char(char c, int col, int row, char attr, uint8_t* vidmem);
 int get_offset(int col, int row);
 int get_offset_row(int offset);
 int get_offset_col(int offset);
 void put_pixel(int x, int y, int color);
+
 
 int get_cursor_offset();
 
@@ -39,7 +42,7 @@ void kprint_at(char *message, int col, int row)
     int i = 0;
     while (message[i] != 0)
     {
-        offset = print_char(message[i++], col, row, WHITE_ON_BLACK);
+        offset = print_char(message[i++], col, row, WHITE_ON_BLACK, get_video_mem());
         /* Compute row/col for next iteration */
         row = get_offset_row(offset);
         col = get_offset_col(offset);
@@ -56,7 +59,8 @@ void kprint_backspace()
     int offset = get_cursor_offset() - 2;
     int row = get_offset_row(offset);
     int col = get_offset_col(offset);
-    print_char(0x08, col, row, WHITE_ON_BLACK);
+
+    print_char(0x08, col, row, WHITE_ON_BLACK, get_video_mem());
 }
 
 void kput_pixel(int x, int y, int color)
@@ -82,6 +86,19 @@ int get_cursor_offset()
  **********************************************************/
 
 /**
+ * Returns a pointer to the appropriate video memory location according to the video type
+*/
+uint8_t* get_video_mem() {
+    uint8_t* vidmem;
+    if (get_bios_area_video_type() == VIDEO_TYPE_COLOR) {
+        vidmem = (uint8_t*)VIDEO_ADDRESS_COLOR;
+    } else {
+        vidmem = (uint8_t*)VIDEO_ADDRESS_MONOCHROME;
+    }
+    return vidmem;
+}
+
+/**
  * Innermost print function for our kernel, directly accesses the video memory 
  *
  * If 'col' and 'row' are negative, we will print at current cursor location
@@ -89,9 +106,8 @@ int get_cursor_offset()
  * Returns the offset of the next character
  * Sets the video cursor to the returned offset
  */
-int print_char(char c, int col, int row, char attr)
+int print_char(char c, int col, int row, char attr, uint8_t* vidmem)
 {
-    uint8_t *vidmem = (uint8_t *)VIDEO_ADDRESS;
     if (!attr)
         attr = WHITE_ON_BLACK;
 
@@ -131,12 +147,12 @@ int print_char(char c, int col, int row, char attr)
     {
         int i;
         for (i = 1; i < MAX_ROWS; i++)
-            memory_copy((uint8_t *)(get_offset(0, i) + VIDEO_ADDRESS),
-                        (uint8_t *)(get_offset(0, i - 1) + VIDEO_ADDRESS),
+            memory_copy((uint8_t *)(get_offset(0, i) + VIDEO_ADDRESS_COLOR),
+                        (uint8_t *)(get_offset(0, i - 1) + VIDEO_ADDRESS_COLOR),
                         MAX_COLS * 2);
 
         /* Blank last line */
-        char *last_line = (char *)(get_offset(0, MAX_ROWS - 1) + (uint8_t *)VIDEO_ADDRESS);
+        char *last_line = (char *)(get_offset(0, MAX_ROWS - 1) + (uint8_t *)VIDEO_ADDRESS_COLOR);
         for (i = 0; i < MAX_COLS * 2; i++)
             last_line[i] = 0;
 
@@ -161,7 +177,7 @@ void clear_screen()
 {
     int screen_size = MAX_COLS * MAX_ROWS;
     int i;
-    uint8_t *screen = (uint8_t *)VIDEO_ADDRESS;
+    uint8_t *screen = (uint8_t *)VIDEO_ADDRESS_COLOR;
 
     for (i = 0; i < screen_size; i++)
     {
@@ -173,7 +189,7 @@ void clear_screen()
 
 void put_pixel(int col, int row, int color)
 {
-    uint8_t *screen = (uint8_t *)VIDEO_ADDRESS;
+    uint8_t *screen = (uint8_t *)VIDEO_ADDRESS_COLOR;
 
     /* Error control: print a red 'E' if the coords aren't right */
     if (col >= MAX_COLS || row >= MAX_ROWS)
