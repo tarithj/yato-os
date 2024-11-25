@@ -33,7 +33,7 @@ jobs:
 
       - name: "Build"
         run: |
-          make os-image.bin
+          make boot.iso
 
       - uses: "marvinpinto/action-automatic-releases@latest"
         with:
@@ -43,4 +43,4 @@ jobs:
           title: "Development Release"
           files: |
             LICENSE.txt
-            os-image.bin
+            boot.iso
