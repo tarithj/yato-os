@@ -8,12 +8,19 @@ CC = /usr/local/i386elfgcc/bin/i386-elf-gcc
 GDB = /usr/local/i386elfgcc/bin/i386-elf-gdb
 LD = /usr/local/i386elfgcc/bin/i386-elf-ld
 
+ifeq ($(shell grep -i "debian" /etc/os-release),)
+    GRUB_CMD=grub2-mkrescue
+else
+    GRUB_CMD=grub-mkrescue
+endif
+
 # -g: Use debugging symbols in gcc
 CFLAGS = -g -m32 -fno-builtin -fno-stack-protector -nostartfiles -nodefaultlibs \
 		 -Wall -Wextra -Werror -ffreestanding
 		 
 boot.iso: kernel.bin
-	$(grub2-mkrescue -o boot.iso iso)
+	$(GRUB_CMD) -o boot.iso iso
+
 
 kernel.bin: boot/boot.o kernel/kernel.o ${OBJ}
 	${CC} -T linker.ld -o iso/boot/grub/kernel.bin -ffreestanding -O2 -nostdlib $^ -lgcc 
