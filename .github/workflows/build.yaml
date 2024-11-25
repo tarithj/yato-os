@@ -32,8 +32,9 @@ jobs:
           echo installing nasm
           sudo apt install nasm
           cd ..
-
-
+      - name: "Build"
+        run: |
+          make boot.iso
       - uses: "marvinpinto/action-automatic-releases@latest"
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
