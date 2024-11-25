@@ -18,6 +18,7 @@ jobs:
 
       - name: "Setup build enviroment"
         run: |
+          alias grub2-mkrescue=grub-mkrescue
           sudo apt-get update
           sudo apt-get install -y grub2-common grub-pc-bin grub-efi-amd64-bin xorriso
           echo downloading i386 gcc toolkit script
