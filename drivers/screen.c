@@ -4,6 +4,26 @@
 #include "bios.h"
 
 #include <stdint.h>
+#include "font.h"
+#include <stdint.h>
+
+framebuffer_info_t framebuffer_out;
+
+// Assume 'mb_info' is a pointer to the multiboot information structure
+void init_framebuffer(vbe_mode_info_structure_t *mb_info) {
+    
+    framebuffer_out.fb_addr = mb_info->framebuffer;    // Framebuffer address is at offset 40 bytes (10th element, assuming uint32_t)
+    framebuffer_out.fb_pitch = mb_info->pitch;   // Framebuffer pitch
+    framebuffer_out.fb_width = mb_info->width;   // Framebuffer width
+    framebuffer_out.fb_height = mb_info->height;  // Framebuffer height
+    framebuffer_out.fb_bpp =32;     // Framebuffer bits per pixel
+    
+    // Now you have the framebuffer information and can start writing to it
+}
+
+
+
+
 
 /* Declaration of private functions */
 void set_cursor_offset(int offset);
@@ -12,8 +32,7 @@ int print_char(char c, int col, int row, char attr, uint8_t* vidmem);
 int get_offset(int col, int row);
 int get_offset_row(int offset);
 int get_offset_col(int offset);
-void put_pixel(int x, int y, int color);
-
+static inline void put_pixel(int x, int y, uint32_t val);
 
 int get_cursor_offset();
 
@@ -21,31 +40,57 @@ int get_cursor_offset();
  * Public Kernel API functions                            *
  **********************************************************/
 
+void draw_char(int x, int y, char character, int color) {
+    int xx,yy;
+    int set = x+y+character;
+    char *bitmap = font8x8_basic[(int)character];
+    for (xx=0; xx < 8; xx++) {
+        for (yy=0; yy < 8; yy++) {
+            set = (bitmap[xx] & 1 << yy) ==0;
+            kput_pixel(y+yy,x+xx,set ?0 :color);
+        }
+    }
+}
+
+int rowS = 0;
+int colS = 0;
 /**
  * Print a message on the specified location
  * If col, row, are negative, we will use the current offset
  */
 void kprint_at(char *message, int col, int row)
 {
+    
     /* Set cursor if col/row are negative */
-    int offset;
-    if (col >= 0 && row >= 0)
-        offset = get_offset(col, row);
-    else
-    {
-        offset = get_cursor_offset();
-        row = get_offset_row(offset);
-        col = get_offset_col(offset);
+    if (col >= 0 && row >= 0){
+        rowS = row;
+        colS = col;
     }
 
-    /* Loop through message and print it */
+     /* Loop through message and print it */
     int i = 0;
     while (message[i] != 0)
     {
-        offset = print_char(message[i++], col, row, WHITE_ON_BLACK, get_video_mem());
+        if(message[i] == '\n') {
+            if(rowS+8 > MAX_ROWS) {
+                rowS = 0;
+                colS = 0;
+                continue;
+            }
+            rowS+=8; colS =0; i++; continue;
+        }
+        int padding = 2;
+        draw_char(rowS, colS, message[i++], 234); //print_char(message[i++], col, row, WHITE_ON_BLACK, get_video_mem());
         /* Compute row/col for next iteration */
-        row = get_offset_row(offset);
-        col = get_offset_col(offset);
+        if (rowS+8+padding > MAX_ROWS) {
+            rowS = rowS+8+padding;
+        }
+        if (colS+8+padding > MAX_COLS) {
+            rowS = 0;
+            colS = 0;
+        } else {
+            colS = colS+8+padding;
+        }
     }
 }
 
@@ -54,13 +99,20 @@ void kprint(char *message)
     kprint_at(message, -1, -1);
 }
 
+void kprintln(char *message)
+{
+    kprint_at(message, -1, -1);
+    kprint_at("\n", -1, -1);
+}
+
+
 void kprint_backspace()
 {
-    int offset = get_cursor_offset() - 2;
-    int row = get_offset_row(offset);
-    int col = get_offset_col(offset);
-
-    print_char(0x08, col, row, WHITE_ON_BLACK, get_video_mem());
+    colS -= 8 + 2;
+    if (colS <= 0) {
+        colS = 0;
+    }
+    draw_char(rowS, colS, ' ', 234);
 }
 
 void kput_pixel(int x, int y, int color)
@@ -147,8 +199,8 @@ int print_char(char c, int col, int row, char attr, uint8_t* vidmem)
     {
         int i;
         for (i = 1; i < MAX_ROWS; i++)
-            memory_copy((uint8_t *)(get_offset(0, i) + VIDEO_ADDRESS_COLOR),
-                        (uint8_t *)(get_offset(0, i - 1) + VIDEO_ADDRESS_COLOR),
+            memory_copy((uint32_t *)(get_offset(0, i) + VIDEO_ADDRESS_COLOR),
+                        (uint32_t *)(get_offset(0, i - 1) + VIDEO_ADDRESS_COLOR),
                         MAX_COLS * 2);
 
         /* Blank last line */
@@ -174,37 +226,35 @@ void set_cursor_offset(int offset)
 }
 
 void clear_screen()
-{
-    int screen_size = MAX_COLS * MAX_ROWS;
-    int i;
-    uint8_t *screen = (uint8_t *)VIDEO_ADDRESS_COLOR;
-
-    for (i = 0; i < screen_size; i++)
+{    
+    for (int x = 0; x < MAX_COLS; x++)
     {
-        screen[i * 2] = ' ';
-        screen[i * 2 + 1] = WHITE_ON_BLACK;
+        for (int y = 0; y < MAX_ROWS; y++)
+        {
+            kput_pixel(x, y, 0); //0x00FFFFFF
+        }
     }
-    set_cursor_offset(get_offset(0, 0));
+    colS = 0;
+    rowS = 0;
 }
 
-void put_pixel(int col, int row, int color)
-{
-    uint8_t *screen = (uint8_t *)VIDEO_ADDRESS_COLOR;
-
-    /* Error control: print a red 'E' if the coords aren't right */
-    if (col >= MAX_COLS || row >= MAX_ROWS)
-    {
-        screen[2 * (MAX_COLS) * (MAX_ROWS)-2] = 'E';
-        screen[2 * (MAX_COLS) * (MAX_ROWS)-1] = RED_ON_WHITE;
-        return;
-    }
-
-    int loc = get_offset(col, row);
-    screen[loc] = color & 255;             // BLUE
-    screen[loc + 1] = (color >> 8) & 255;  // GREEN
-    screen[loc + 2] = (color >> 16) & 255; // RED
+/* void put_pixel(uint32_t x, uint32_t y, uint32_t color) {
+    uint32_t *pixel = (uint32_t *)(framebuffer_out.fb_addr + y * framebuffer_out.fb_pitch + x * (framebuffer_out.fb_bpp / 8));
+    *pixel = color;
 }
+ */
+
+static inline void put_pixel(int x, int y, uint32_t val) {
+    *(uint32_t *) (framebuffer_out.fb_addr + x * 4 + framebuffer_out.fb_pitch * y) = val;
+    //uint32_t *buffer = (uint32_t *) framebuffer_out.fb_addr;
+    //buffer[framebuffer_out.fb_width * y + x] = val;
+}
+
+
 
 int get_offset(int col, int row) { return 2 * (row * MAX_COLS + col); }
 int get_offset_row(int offset) { return offset / (2 * MAX_COLS); }
 int get_offset_col(int offset) { return (offset - (get_offset_row(offset) * 2 * MAX_COLS)) / 2; }
+
+#define VGA_CONTROLLER_ADDR 0x10
+extern void vga_set_mode(unsigned char mode);

@@ -1,2 +1,8 @@
 *.o
 *.bin
+*.iso
+*.txt
+*.img
+*.log
+*.git
+*/.vscode/*.*

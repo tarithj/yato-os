@@ -1,7 +1,7 @@
 #include "idt.h"
 #include "../cpu/type.h"
 #include <stdint.h>
-
+#include "../kernel/paging.h"
 void set_idt_gate(int n, uint32_t handler)
 {
     idt[n].low_offset = low_16(handler);
@@ -13,7 +13,7 @@ void set_idt_gate(int n, uint32_t handler)
 
 void set_idt()
 {
-    idt_reg.base = (uint32_t)&idt;
+    idt_reg.base =  (uint32_t)&idt;
     idt_reg.limit = IDT_ENTRIES * sizeof(idt_gate_t) - 1;
     /* Don't make the mistake of loading &idt -- always load &idt_reg */
     asm volatile("lidtl (%0)"

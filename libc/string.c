@@ -87,3 +87,31 @@ void hex_to_ascii(int n, char str[]) {
     if (tmp >= 0xA) append(str, tmp - 0xA + 'a');
     else append(str, tmp + '0');
 }
+
+char* strcpy(char* dest, const char* src) {
+    char* original_dest = dest;  // Store the starting address of dest
+    
+    // Copy characters from src to dest until we hit the null terminator
+    while ((*dest++ = *src++) != '\0') {
+        // Nothing inside the loop, the assignment does all the work
+    }
+    
+    return original_dest;  // Return the original destination pointer
+}
+
+
+char* strcat(char* dest, const char* src) {
+    char* original_dest = dest;  // Store the starting address of dest
+    
+    // Move dest pointer to the null-terminator of the existing string
+    while (*dest != '\0') {
+        dest++;  // Move the pointer until the end of dest string
+    }
+    
+    // Append each character from src to the end of dest
+    while ((*dest++ = *src++) != '\0') {
+        // Nothing inside the loop, the assignment does all the work
+    }
+    
+    return original_dest;  // Return the original destination pointer
+}

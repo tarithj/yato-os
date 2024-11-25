@@ -35,18 +35,9 @@ static void keyboard_callback(registers_t *regs)
         return;
     if (scancode == BACKSPACE)
     {
-        int offset = get_cursor_offset();
-        int row = get_offset_col(offset);
-
-        if (row < 3)
-        {
-            beep();
-        }
-        else
-        {
-            backspace(key_buffer);
-            kprint_backspace();
-        }
+        backspace(key_buffer);
+        kprint_backspace();
+        
     }
     else if (scancode == ENTER)
     {
@@ -56,21 +47,12 @@ static void keyboard_callback(registers_t *regs)
     }
     else
     {
-        int offset = get_cursor_offset();
-        int col = get_offset_col(offset);
-
-        if (col + 1 == MAX_COLS)
-        {
-            beep();
-        }
-        else
-        {
             char letter = sc_ascii[(int)scancode];
             /* Remember that kprint only accepts char[] */
             char str[2] = {letter, '\0'};
             append(key_buffer, letter);
             kprint(str);
-        }
+        
     }
     UNUSED(regs);
 }

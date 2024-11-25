@@ -1,7 +1,7 @@
-C_SOURCES = $(wildcard kernel/*.c drivers/*.c cpu/*.c libc/*.c ksh/*.c)
-HEADERS = $(wildcard kernel/*.h drivers/*.h cpu/*.h libc/*.h ksh/*.h)
+C_SOURCES = $(wildcard kernel/*.c drivers/*.c cpu/*.c libc/*.c ksh/*.c memory/*.c)
+HEADERS = $(wildcard kernel/*.h  cpu/*.h libc/*.h ksh/*.h memory/*.h drivers/*.h)
 # Nice syntax for file extension replacement
-OBJ = ${C_SOURCES:.c=.o cpu/interrupt.o} 
+OBJ = ${C_SOURCES:.c=.o cpu/interrupt.o drivers/ata_internal.o drivers/screen_internal.o kernel/pre.o } 
 
 # Change this if your cross-compiler is somewhere else
 CC = /usr/local/i386elfgcc/bin/i386-elf-gcc
@@ -10,31 +10,27 @@ LD = /usr/local/i386elfgcc/bin/i386-elf-ld
 
 # -g: Use debugging symbols in gcc
 CFLAGS = -g -m32 -fno-builtin -fno-stack-protector -nostartfiles -nodefaultlibs \
-		 -Wall -Wextra -Werror
+		 -Wall -Wextra -Werror -ffreestanding
 		 
-# First rule is run by default
-os-image.bin: boot/bootsect.bin kernel.bin
-	cat $^ > os-image.bin
+boot.iso: kernel.bin
+	grub2-mkrescue -o boot.iso iso
 
-# '--oformat binary' deletes all symbols as a collateral, so we don't need
-# to 'strip' them manually on this case
-kernel.bin: boot/kernel_entry.o ${OBJ}
-	${LD} -o $@ -Ttext 0x1000 $^ --oformat binary
+kernel.bin: boot/boot.o kernel/kernel.o ${OBJ}
+	${CC} -T linker.ld -o iso/boot/grub/kernel.bin -ffreestanding -O2 -nostdlib $^ -lgcc 
 
-# Used for debugging purposes
-kernel.elf: boot/kernel_entry.o ${OBJ}
-	${LD} -o $@ -Ttext 0x1000 $^ 
 
-run: os-image.bin
-	qemu-system-i386 -fda os-image.bin --curses -soundhw pcspk
+run: boot.iso
+	qemu-system-i386 -hda boot.iso -display curses -machine q35
 
-run_graphic: os-image.bin
-	qemu-system-i386 -fda os-image.bin -soundhw pcspk
+run_graphic: boot.iso 
+	qemu-system-i386 -hda boot.iso -machine q35  -device VGA 
+	
 
 # Open the connection to qemu and load our kernel-object file with symbols
-debug: os-image.bin kernel.elf
-	qemu-system-i386 -s -fda os-image.bin -d guest_errors,int &
-	${GDB} -ex "target remote localhost:1234" -ex "symbol-file kernel.elf"
+# qemu-system-i386 -machine q35 -s -fda os-image.bin -d guest_errors,int &
+debug: boot.iso
+	qemu-system-i386 -hda boot.iso -machine q35 -device VGA  -d int -s -S &
+	${GDB} -ex "target remote localhost:1234" -ex "symbol-file iso/boot/grub/kernel.bin"
 
 # Generic rules for wildcards
 # To make an object, always compile from its .c

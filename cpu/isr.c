@@ -5,6 +5,7 @@
 #include "../libc/string.h"
 #include "timer.h"
 #include "port.h"
+#include "../libc/mem.h"
 
 isr_t interrupt_handlers[256];
 
