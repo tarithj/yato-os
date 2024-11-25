@@ -13,7 +13,7 @@ CFLAGS = -g -m32 -fno-builtin -fno-stack-protector -nostartfiles -nodefaultlibs 
 		 -Wall -Wextra -Werror -ffreestanding
 		 
 boot.iso: kernel.bin
-	grub2-mkrescue -o boot.iso iso
+	$(grub2-mkrescue -o boot.iso iso)
 
 kernel.bin: boot/boot.o kernel/kernel.o ${OBJ}
 	${CC} -T linker.ld -o iso/boot/grub/kernel.bin -ffreestanding -O2 -nostdlib $^ -lgcc 
