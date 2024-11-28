@@ -11,7 +11,7 @@ char* __int_str(intmax_t i, char b[], int base, bool plusSignIfNeeded, bool spac
                 int paddingNo, bool justify, bool zeroPad) {
     
     char digit[32] = {0};
-    memory_set((uint32_t *)digit, 0, 32);
+    memory_set((uint8_t *)digit, 0, 32);
     strcpy(digit, "0123456789");
     
     if (base == 16) {
@@ -187,7 +187,7 @@ int vprintf (const char* format, va_list list)
             }
             specifier = format[i];
             
-            memory_set((uint32_t *)intStrBuffer, 0, 256);
+            memory_set((uint8_t *)intStrBuffer, 0, 256);
             
             int base = 10;
             if (specifier == 'o') {

@@ -50,7 +50,7 @@ uint32_t allocate_page(page_directory_t* page_directory, uint32_t virtual_addres
         page_directory->tables[directory_index] = (page_table_t*)kmalloc(sizeof(page_table_t), 1, 0);
 
         // Ensure that the page table is cleared (set all entries to 0)
-        memory_set((uint32_t*) (page_directory->tables[directory_index]), 0, sizeof(page_table_t));
+        memory_set((uint8_t*) (page_directory->tables[directory_index]), 0, sizeof(page_table_t));
 
         // Set the present bit and read/write permissions for the directory entry
         page_directory->tables[directory_index]->entries[directory_index].present = 1;

@@ -1,6 +1,8 @@
   
 #include "mem.h"
-
+#define KERNEL_VIRTUAL_BASE 0xC0000000 // Example base for virtual addresses
+#define INITIAL_PHYSICAL_ADDR 0x10000
+#define PAGE_SIZE 0x400000  // 4 MB
 void memory_copy(uint32_t *source, uint32_t *dest, int nbytes) {
     int i;
     for (i = 0; i < nbytes; i++) {
@@ -8,8 +10,16 @@ void memory_copy(uint32_t *source, uint32_t *dest, int nbytes) {
     }
 }
 
-void memory_set(uint32_t *dest, uint32_t val, uint32_t len) {
-    uint32_t *temp = (uint32_t *)dest;
+// Function to align a memory address to the nearest 4MB boundary
+uint32_t align_to_4MB(uint32_t address) {
+    uintptr_t addr = (uintptr_t)address;  // Convert pointer to uintptr_t for bitwise operations
+    addr &= ~(PAGE_SIZE - 1);  // Clear the lower 22 bits to align to 4MB boundary
+    return addr;  // Convert back to pointer and return
+}
+
+
+void memory_set(uint8_t *dest, uint8_t val, uint32_t len) {
+    uint8_t *temp = (uint8_t *)dest;
     for ( ; len != 0; len--) *temp++ = val;
 }
 
@@ -25,9 +35,6 @@ int memory_compare(const void *ptr1, const void *ptr2, size_t num) {
     
     return 0;
 }
-#define KERNEL_VIRTUAL_BASE 0xC0000000 // Example base for virtual addresses
-#define INITIAL_PHYSICAL_ADDR 0x10000
-#define PAGE_SIZE 0x1000 // 4 KB
 /* This should be computed at link time, but a hardcoded
  * value is fine for now. Remember that our kernel starts
  * at 0x1000 as defined on the Makefile */
